@@ -1,0 +1,13 @@
+{
+  "name": "jq-validator",
+  "version": "0.1.0",
+  "description": "jQuery form validation tool easy to implement and compatible with bootstrap",
+  "author": "Alessandro Vioni AKA genoma",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "^0.4.4",
+    "grunt-contrib-coffee": "^0.10.1",
+    "grunt-contrib-uglify": "^0.4.0",
+    "grunt-contrib-watch": "^0.6.1"
+  }
+}
