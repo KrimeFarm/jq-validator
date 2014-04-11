@@ -4,13 +4,13 @@ $.fn.extend
   jqValidator: (options) ->
     # Default settings
     settings =
-      debug: false
-      isForm: false
-      buttonClass: ".btn"
-      personalized_error: false
-      correct_function: () ->
-      error_function: () ->
-      callback: () ->
+      debug: false # debug option for console.log
+      isForm: false # False for form not wrapper in <form></form> (.net), True for correct form wrapping
+      buttonClass: ".btn" # The class of the submit button
+      personalized_error: false # true for give personalized callback functions in case of wrong or correct form compilation
+      correct_function: () -> # function called if true personalized_error when a field is compiled correctly
+      error_function: () -> # function called when the form is not compiled in the right way
+      callback: () -> # callback called when the form is submitted
 
     # Merge default settings with options.
     settings = $.extend settings, options
@@ -37,7 +37,7 @@ $.fn.extend
 
       # Put the regular expressions
       # in a function that is used
-      # later with data-object HTML5
+      # later with data- attributes
       checkIsMail = (input) ->
         pattern = new RegExp(emailReg)
         return pattern.test(input)
@@ -122,7 +122,7 @@ $.fn.extend
         # Debug
         log "value is #{value}"
 
-        # Now check the whole lot of data-object
+        # Now check the whole lot of data- attribute
         # and if the field is compiled as requested
         if value > issuedLength and ismail is true and isname is true and isnumber is true
           $(element).addClass "checked"
