@@ -189,6 +189,6 @@ $.fn.extend
 
 
   ##
-  # by Alessandro Vioni AKA Jenoma
+  # by Alessandro Vioni AKA genoma
   # for Krimefarm spring 2014
   ##
