@@ -7,6 +7,9 @@ $.fn.extend
       debug: false
       isForm: false
       buttonClass: ".btn"
+      personalized_error: false
+      correct_function: () ->
+      error_function: () ->
       callback: () ->
 
     # Merge default settings with options.
@@ -123,9 +126,15 @@ $.fn.extend
         # and if the field is compiled as requested
         if value > issuedLength and ismail is true and isname is true and isnumber is true
           $(element).addClass "checked"
-          $(element).closest(".form-group").removeClass "has-error"
+          if settings.personalized_error
+            settings.correct_function.call(this)
+          else
+            $(element).closest(".form-group").removeClass "has-error"
         else
-          $(element).closest(".form-group").addClass "has-error"
+          if settings.personalized_error
+            settings.error_function.call(this)
+          else
+            $(element).closest(".form-group").addClass "has-error"
           $(element).removeClass "checked"
 
 

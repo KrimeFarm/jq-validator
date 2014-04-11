@@ -10,6 +10,9 @@
         debug: false,
         isForm: false,
         buttonClass: ".btn",
+        personalized_error: false,
+        correct_function: function() {},
+        error_function: function() {},
         callback: function() {}
       };
       settings = $.extend(settings, options);
@@ -95,9 +98,17 @@
           log("value is " + value);
           if (value > issuedLength && ismail === true && isname === true && isnumber === true) {
             $(element).addClass("checked");
-            return $(element).closest(".form-group").removeClass("has-error");
+            if (settings.personalized_error) {
+              return settings.correct_function.call(this);
+            } else {
+              return $(element).closest(".form-group").removeClass("has-error");
+            }
           } else {
-            $(element).closest(".form-group").addClass("has-error");
+            if (settings.personalized_error) {
+              settings.error_function.call(this);
+            } else {
+              $(element).closest(".form-group").addClass("has-error");
+            }
             return $(element).removeClass("checked");
           }
         };
