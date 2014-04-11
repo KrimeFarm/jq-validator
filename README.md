@@ -19,6 +19,9 @@ An easy to use jQuery validation plugin compatible with .net projects and bootst
 ## Custom data attributes
 
 `data-lenght="3"` The minimum lenght of the string in the input field
+
 `data-mail` The string needs to be an email
+
 `data-number` The string has to be a number
+
 `data-name` The string is letters only
