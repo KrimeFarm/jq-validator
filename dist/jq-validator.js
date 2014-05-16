@@ -8,12 +8,10 @@
       var log, settings;
       settings = {
         debug: false,
-        isForm: false,
+        preventDefault: true,
         buttonClass: ".btn",
-        personalized_error: false,
-        correct_function: function() {},
-        error_function: function() {},
-        callback: function() {}
+        callback: function() {},
+        error: function() {}
       };
       settings = $.extend(settings, options);
       log = function(msg) {
@@ -28,7 +26,7 @@
         $submit = $(settings.buttonClass, $this);
         nameReg = /^[A-Za-z]+$/;
         numberReg = /^[0-9]+$/;
-        emailReg = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i;
+        emailReg = /[^\s@]+@[^\s@]+\.[^\s@]+/;
         checkIsMail = function(input) {
           var pattern;
           pattern = new RegExp(emailReg);
@@ -97,19 +95,11 @@
           value = value.length;
           log("value is " + value);
           if (value > issuedLength && ismail === true && isname === true && isnumber === true) {
-            $(element).addClass("checked");
-            if (settings.personalized_error) {
-              return settings.correct_function.call(this);
-            } else {
-              return $(element).closest(".form-group").removeClass("has-error");
-            }
+            $(element).addClass("checked").removeClass("error");
+            return $(element).closest(".form-group").removeClass("has-error");
           } else {
-            if (settings.personalized_error) {
-              settings.error_function.call(this);
-            } else {
-              $(element).closest(".form-group").addClass("has-error");
-            }
-            return $(element).removeClass("checked");
+            $(element).closest(".form-group").addClass("has-error");
+            return $(element).removeClass("checked").addClass("error");
           }
         };
         size = $formElements.size();
@@ -124,19 +114,34 @@
             return $(settings.buttonClass).removeClass("submit-ready");
           }
         };
-        $formElements.on("change keyup focus", function() {
-          checkElemFull($(this));
-          return checkAllComplete(".checked");
-        });
         return $(settings.buttonClass).click(function(e) {
+          var $theErrorField, isDataMail, theErrorFieldPlaceholder, theErrorFieldValue;
+          if (settings.preventDefault) {
+            e.preventDefault();
+          }
+          $formElements.each(function() {
+            checkElemFull($(this));
+            return checkAllComplete(".checked");
+          });
           if ($(this).hasClass("submit-ready")) {
             settings.callback.call(this);
             return log("submit");
           } else {
-            if (settings.isForm) {
-              e.preventDefault();
+            log("don't submit");
+            $theErrorField = $(".error").first();
+            $theErrorField.focus();
+            theErrorFieldValue = $theErrorField.val();
+            theErrorFieldPlaceholder = $theErrorField.attr("placeholder");
+            isDataMail = $theErrorField.attr("data-mail");
+            if (isDataMail != null) {
+              $theErrorField.val("").attr("placeholder", "Wrong email address");
+            } else {
+              $theErrorField.val("").attr("placeholder", "This field is required");
             }
-            return log("don't submit");
+            setTimeout(function() {
+              return $theErrorField.val(theErrorFieldValue);
+            }, 2000);
+            return settings.error.call(this);
           }
         });
       });
