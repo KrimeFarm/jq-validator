@@ -3,19 +3,16 @@ jq-validator (beta)
 
 #### This software is still in development!
 
-An easy to use jQuery validation plugin compatible with .net projects and bootstrap.
+An easy to use jQuery validation plugin tailored for Bootstrap **beta**.
 
 ## Configurations
 
 ```coffeescript
-  settings =
-    debug: false # debug option for console.log
-    isForm: false # False for form not wrapper in <form></form> (.net), True for correct form wrapping
-    buttonClass: ".btn" # The class of the submit button
-    personalized_error: false # true for give personalized callback functions in case of wrong or correct form compilation
-    correct_function: () -> # function called if true personalized_error when a field is compiled correctly
-    error_function: () -> # function called when the form is not compiled in the right way
-    callback: () -> # callback called when the form is submitted
+      debug: false # debug option for console.log
+      preventDefault: true # True to prevent submit action when button is pressed and when button is a type="submit"
+      buttonClass: ".btn" # The class of the submit button
+      callback: () -> # callback called when the form is submitted
+      error: () -> # call a function if the form is not compiled correctly
 ```
 
 ## Custom data attributes
