@@ -5,12 +5,10 @@ $.fn.extend
     # Default settings
     settings =
       debug: false # debug option for console.log
-      isForm: false # False for form not wrapper in <form></form> (.net), True for correct form wrapping
+      preventDefault: true # True to prevent submit action when button is pressed and when button is a type="submit"
       buttonClass: ".btn" # The class of the submit button
-      personalized_error: false # true for give personalized callback functions in case of wrong or correct form compilation
-      correct_function: () -> # function called if true personalized_error when a field is compiled correctly
-      error_function: () -> # function called when the form is not compiled in the right way
       callback: () -> # callback called when the form is submitted
+      error: () -> # call a function if the form is not compiled correctly
 
     # Merge default settings with options.
     settings = $.extend settings, options
@@ -125,17 +123,15 @@ $.fn.extend
         # Now check the whole lot of data- attribute
         # and if the field is compiled as requested
         if value > issuedLength and ismail is true and isname is true and isnumber is true
-          $(element).addClass "checked"
-          if settings.personalized_error
-            settings.correct_function.call(this)
-          else
-            $(element).closest(".form-group").removeClass "has-error"
+          $(element)
+            .addClass "checked"
+            .removeClass "error"
+          $(element).closest(".form-group").removeClass "has-error"
         else
-          if settings.personalized_error
-            settings.error_function.call(this)
-          else
-            $(element).closest(".form-group").addClass "has-error"
-          $(element).removeClass "checked"
+          $(element).closest(".form-group").addClass "has-error"
+          $(element)
+            .removeClass "checked"
+            .addClass "error"
 
 
 
@@ -163,17 +159,20 @@ $.fn.extend
       # This fires on _complete, keyup, focus
       # the two principal control functions
       # verifying the form submission
-      $formElements.on "change keyup focus", ->
-        checkElemFull($(this))
-        checkAllComplete(".checked")
+      # $formElements.on "change keyup focus", ->
+      #   checkElemFull($(this))
+      #   checkAllComplete(".checked")
 
-      # To compel with .net if the isForm
-      # is set to _false_ there are no consequences
-      # but only one class is added to the button
-      # which means is ready to be manipulated
-      # by the framework, if is _true_ form submission
-      # is prevented by e.preventDefault
+      # Start the check of every controlled field
+      # and preventDefault if required by settings
       $(settings.buttonClass).click (e) ->
+        e.preventDefault() if settings.preventDefault
+
+        # Control every required field
+        $formElements.each ->
+          checkElemFull($(this))
+          checkAllComplete(".checked")
+
         if $(this).hasClass "submit-ready"
           # This is the callback function
           # which can be used to fire another
@@ -182,9 +181,36 @@ $.fn.extend
           # Debug
           log "submit"
         else
-          e.preventDefault() if settings.isForm
-          # Debug?
+          # Debug
           log "don't submit"
+
+          # Few checks to be run when the
+          # button is clicked to do some
+          # magic animation
+          $theErrorField = $(".error").first()
+          $theErrorField.focus()
+          theErrorFieldValue = $theErrorField.val()
+          theErrorFieldPlaceholder = $theErrorField.attr "placeholder"
+
+          # Write the right val() into the required field
+          # eg: if email or not
+          isDataMail = $theErrorField.attr "data-mail"
+
+          if isDataMail?
+            $theErrorField.val("").attr "placeholder", "Wrong email address"
+          else
+            $theErrorField.val("").attr "placeholder", "This field is required"
+
+          # Perform a switch between value and placeholder
+          setTimeout ->
+            $theErrorField.val(theErrorFieldValue)
+          , 2000
+
+
+          # Call a function to be submitted
+          # when the form is not correctly
+          # compiled
+          settings.error.call(this)
 
 
 
