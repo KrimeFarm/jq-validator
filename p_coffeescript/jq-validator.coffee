@@ -8,6 +8,7 @@ $.fn.extend
       preventDefault: true # True to prevent submit action when button is pressed and when button is a type="submit"
       buttonClass: ".btn" # The class of the submit button
       placeholderTimeout: 2000 # The timeout placeholder animation
+      errorsLog: "configuration/errors-en.json"
       callback: () -> # callback called when the form is submitted
       error: () -> # call a function if the form is not compiled correctly
 
@@ -171,7 +172,7 @@ $.fn.extend
 
 
       errorsArray=[]
-      $.getJSON "configuration/errors.json", (data) ->
+      $.getJSON settings.errorsLog, (data) ->
         $.each data, (key, val) ->
           errorsArray.push
             key: key

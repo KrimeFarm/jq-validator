@@ -11,6 +11,7 @@
         preventDefault: true,
         buttonClass: ".btn",
         placeholderTimeout: 2000,
+        errorsLog: "configuration/errors-en.json",
         callback: function() {},
         error: function() {}
       };
@@ -128,7 +129,7 @@
           }
         };
         errorsArray = [];
-        $.getJSON("configuration/errors.json", function(data) {
+        $.getJSON(settings.errorsLog, function(data) {
           return $.each(data, function(key, val) {
             errorsArray.push({
               key: key,
