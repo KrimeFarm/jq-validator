@@ -7,6 +7,7 @@ $.fn.extend
       debug: true # debug option for console.log
       preventDefault: true # True to prevent submit action when button is pressed and when button is a type="submit"
       buttonClass: ".btn" # The class of the submit button
+      placeholderTimeout: 2000 # The timeout placeholder animation
       callback: () -> # callback called when the form is submitted
       error: () -> # call a function if the form is not compiled correctly
 
@@ -208,16 +209,29 @@ $.fn.extend
           # Write the right val() into the required field
           # eg: if email or not
           isDataMail = $theErrorField.attr "data-mail"
+          isDataText = $theErrorField.attr "data-text"
+          isDataNumber = $theErrorField.attr "data-number"
+          isDataLength = $theErrorField.attr "data-length"
 
           if isDataMail?
             $theErrorField.val("").attr "placeholder", "Wrong email address"
+          else if isDataText?
+            $theErrorField.val("").attr "placeholder", "Only letter for this field"
+          else if isDataNumber?
+            $theErrorField.val("").attr "placeholder", "Only numbers are admitted"
+          else if isDataLength?
+            $theErrorField.val("").attr "placeholder", "This field must be #{isDataLength} words long"
           else
             $theErrorField.val("").attr "placeholder", "This field is required"
 
           # Perform a switch between value and placeholder
+          # or vice versa
           setTimeout ->
-            $theErrorField.val(theErrorFieldValue)
-          , 2000
+            if theErrorFieldValue?
+              $theErrorField.attr "placeholder", theErrorFieldPlaceholder
+            else
+              $theErrorField.val(theErrorFieldValue)
+          , settings.placeholderTimeout
 
 
           # Call a function to be submitted

@@ -10,6 +10,7 @@
         debug: true,
         preventDefault: true,
         buttonClass: ".btn",
+        placeholderTimeout: 2000,
         callback: function() {},
         error: function() {}
       };
@@ -127,7 +128,7 @@
           }
         };
         return $(settings.buttonClass).click(function(e) {
-          var $theErrorField, isDataMail, theErrorFieldPlaceholder, theErrorFieldValue;
+          var $theErrorField, isDataLength, isDataMail, isDataNumber, isDataText, theErrorFieldPlaceholder, theErrorFieldValue;
           if (settings.preventDefault) {
             e.preventDefault();
           }
@@ -145,14 +146,27 @@
             theErrorFieldValue = $theErrorField.val();
             theErrorFieldPlaceholder = $theErrorField.attr("placeholder");
             isDataMail = $theErrorField.attr("data-mail");
+            isDataText = $theErrorField.attr("data-text");
+            isDataNumber = $theErrorField.attr("data-number");
+            isDataLength = $theErrorField.attr("data-length");
             if (isDataMail != null) {
               $theErrorField.val("").attr("placeholder", "Wrong email address");
+            } else if (isDataText != null) {
+              $theErrorField.val("").attr("placeholder", "Only letter for this field");
+            } else if (isDataNumber != null) {
+              $theErrorField.val("").attr("placeholder", "Only numbers are admitted");
+            } else if (isDataLength != null) {
+              $theErrorField.val("").attr("placeholder", "This field must be " + isDataLength + " words long");
             } else {
               $theErrorField.val("").attr("placeholder", "This field is required");
             }
             setTimeout(function() {
-              return $theErrorField.val(theErrorFieldValue);
-            }, 2000);
+              if (theErrorFieldValue != null) {
+                return $theErrorField.attr("placeholder", theErrorFieldPlaceholder);
+              } else {
+                return $theErrorField.val(theErrorFieldValue);
+              }
+            }, settings.placeholderTimeout);
             return settings.error.call(this);
           }
         });
