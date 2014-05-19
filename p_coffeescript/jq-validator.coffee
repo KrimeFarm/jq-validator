@@ -21,8 +21,9 @@ $.fn.extend
     return @each ()->
 
       $this = $(this)
-      $formElements = $("input:not([type=\"checkbox\"]):not([type=\"button\"]):not([type=\"button\"]), textarea, select", $this)
-      $formCheckbox = $("input[type=\"checkbox\"]", $this)
+      $formElements = $("input:not([type=\"radio\"]):not([type=\"button\"]), textarea, select", $this)
+      # $formCheckbox = $("input[type=\"checkbox\"]", $this)
+      # $formRadio = $("input[type=\"radio\"]", $this)
       $submit = $(settings.buttonClass, $this)
 
       # Regular expressions
@@ -57,6 +58,7 @@ $.fn.extend
       # to validate the form, it uses
       # the regular expressions written
       # above
+
       fieldLenght = (element) ->
         dataLength = $(element).attr "data-length"
         if dataLength?
@@ -65,6 +67,15 @@ $.fn.extend
         else
           stringLenght = 0
           return stringLenght
+
+      checkRadioVerified = (element) ->
+        checkRadioRequired = $(element).attr "data-requiredbox"
+        if checkRadioRequired?
+          dataChecked = $(element).prop "checked"
+          log "Checkbox is #{dataChecked}"
+          return dataChecked
+        else
+          return true
 
       fieldMail = (element) ->
         isMail = $(element).attr "data-mail"
@@ -108,6 +119,7 @@ $.fn.extend
         ismail = fieldMail(element)
         isname = fieldText(element)
         isnumber = fieldNumber(element)
+        ischecked = checkRadioVerified(element)
 
         # Debug scripts
         log "data-length #{fieldLenght()}"
@@ -123,7 +135,7 @@ $.fn.extend
 
         # Now check the whole lot of data- attribute
         # and if the field is compiled as requested
-        if value >= issuedLength and ismail is true and isname is true and isnumber is true
+        if value >= issuedLength and ismail is true and isname is true and isnumber is true and ischecked is true
           $(element)
             .addClass "checked"
             .removeClass "error"

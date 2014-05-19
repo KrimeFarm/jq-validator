@@ -20,10 +20,9 @@
         }
       };
       return this.each(function() {
-        var $formCheckbox, $formElements, $submit, $this, checkAllComplete, checkElemFull, checkIsMail, checkIsName, checkIsNumber, emailReg, fieldLenght, fieldMail, fieldNumber, fieldText, nameReg, numberReg, size;
+        var $formElements, $submit, $this, checkAllComplete, checkElemFull, checkIsMail, checkIsName, checkIsNumber, checkRadioVerified, emailReg, fieldLenght, fieldMail, fieldNumber, fieldText, nameReg, numberReg, size;
         $this = $(this);
-        $formElements = $("input:not([type=\"checkbox\"]):not([type=\"button\"]):not([type=\"button\"]), textarea, select", $this);
-        $formCheckbox = $("input[type=\"checkbox\"]", $this);
+        $formElements = $("input:not([type=\"radio\"]):not([type=\"button\"]), textarea, select", $this);
         $submit = $(settings.buttonClass, $this);
         nameReg = /^[A-Za-z]+$/;
         numberReg = /^[0-9]+$/;
@@ -52,6 +51,17 @@
           } else {
             stringLenght = 0;
             return stringLenght;
+          }
+        };
+        checkRadioVerified = function(element) {
+          var checkRadioRequired, dataChecked;
+          checkRadioRequired = $(element).attr("data-requiredbox");
+          if (checkRadioRequired != null) {
+            dataChecked = $(element).prop("checked");
+            log("Checkbox is " + dataChecked);
+            return dataChecked;
+          } else {
+            return true;
           }
         };
         fieldMail = function(element) {
@@ -85,17 +95,18 @@
           }
         };
         checkElemFull = function(element) {
-          var ismail, isname, isnumber, issuedLength, value;
+          var ischecked, ismail, isname, isnumber, issuedLength, value;
           issuedLength = fieldLenght(element);
           ismail = fieldMail(element);
           isname = fieldText(element);
           isnumber = fieldNumber(element);
+          ischecked = checkRadioVerified(element);
           log("data-length " + (fieldLenght()));
           log("issuedLength " + issuedLength);
           value = $(element).val();
           value = value.length;
           log("value is " + value);
-          if (value >= issuedLength && ismail === true && isname === true && isnumber === true) {
+          if (value >= issuedLength && ismail === true && isname === true && isnumber === true && ischecked === true) {
             $(element).addClass("checked").removeClass("error");
             return $(element).closest(".form-group").removeClass("has-error");
           } else {
