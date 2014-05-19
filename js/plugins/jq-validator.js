@@ -7,7 +7,7 @@
     jqValidator: function(options) {
       var log, settings;
       settings = {
-        debug: false,
+        debug: true,
         preventDefault: true,
         buttonClass: ".btn",
         placeholderTimeout: 2000,
@@ -21,7 +21,7 @@
         }
       };
       return this.each(function() {
-        var $formElements, $submit, $this, checkAllComplete, checkElemFull, checkIsMail, checkIsName, checkIsNumber, checkboxVerified, emailReg, fieldLenght, fieldMail, fieldNumber, fieldText, nameReg, numberReg, size;
+        var $formElements, $submit, $this, checkAllComplete, checkElemFull, checkIsMail, checkIsName, checkIsNumber, checkboxVerified, emailReg, errorsArray, fieldLenght, fieldMail, fieldNumber, fieldText, nameReg, numberReg, size;
         $this = $(this);
         $formElements = $("input:not([type=\"radio\"]):not([type=\"button\"]), textarea, select", $this);
         $submit = $(settings.buttonClass, $this);
@@ -127,6 +127,15 @@
             return $(settings.buttonClass).removeClass("submit-ready");
           }
         };
+        errorsArray = [];
+        $.getJSON("configuration/errors.json", function(data) {
+          return $.each(data, function(key, val) {
+            errorsArray.push({
+              key: key,
+              val: val
+            });
+          });
+        });
         return $(settings.buttonClass).click(function(e) {
           var $theErrorField, isDataLength, isDataMail, isDataNumber, isDataText, theErrorFieldPlaceholder, theErrorFieldValue;
           if (settings.preventDefault) {
@@ -150,15 +159,15 @@
             isDataNumber = $theErrorField.attr("data-number");
             isDataLength = $theErrorField.attr("data-length");
             if (isDataMail != null) {
-              $theErrorField.val("").attr("placeholder", "Wrong email address");
+              $theErrorField.val("").attr("placeholder", errorsArray[0].val);
             } else if (isDataText != null) {
-              $theErrorField.val("").attr("placeholder", "Only letter for this field");
+              $theErrorField.val("").attr("placeholder", errorsArray[1].val);
             } else if (isDataNumber != null) {
-              $theErrorField.val("").attr("placeholder", "Only numbers are admitted");
+              $theErrorField.val("").attr("placeholder", errorsArray[2].val);
             } else if (isDataLength != null) {
-              $theErrorField.val("").attr("placeholder", "This field must be " + isDataLength + " words long");
+              $theErrorField.val("").attr("placeholder", errorsArray[3].val.first + isDataLength + errorsArray[3].val.second);
             } else {
-              $theErrorField.val("").attr("placeholder", "This field is required");
+              $theErrorField.val("").attr("placeholder", errorsArray[4].val);
             }
             setTimeout(function() {
               if (theErrorFieldValue != null) {

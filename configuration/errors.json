@@ -1,0 +1,10 @@
+{
+  "mail": "You need to use a vaild email address!",
+  "text": "You need to use only letters!",
+  "numbers": "You need to use only numbers!",
+  "length": {
+    "first": "This field needs to be ",
+    "second": " letters long!"
+  },
+  "general": "This field is required!"
+}

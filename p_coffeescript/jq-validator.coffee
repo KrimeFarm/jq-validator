@@ -4,7 +4,7 @@ $.fn.extend
   jqValidator: (options) ->
     # Default settings
     settings =
-      debug: false # debug option for console.log
+      debug: true # debug option for console.log
       preventDefault: true # True to prevent submit action when button is pressed and when button is a type="submit"
       buttonClass: ".btn" # The class of the submit button
       placeholderTimeout: 2000 # The timeout placeholder animation
@@ -170,6 +170,14 @@ $.fn.extend
           $(settings.buttonClass).removeClass "submit-ready"
 
 
+      errorsArray=[]
+      $.getJSON "configuration/errors.json", (data) ->
+        $.each data, (key, val) ->
+          errorsArray.push
+            key: key
+            val: val
+          return
+
       # This fires on _complete, keyup, focus
       # the two principal control functions
       # verifying the form submission
@@ -213,16 +221,17 @@ $.fn.extend
           isDataNumber = $theErrorField.attr "data-number"
           isDataLength = $theErrorField.attr "data-length"
 
+
           if isDataMail?
-            $theErrorField.val("").attr "placeholder", "Wrong email address"
+            $theErrorField.val("").attr "placeholder", errorsArray[0].val
           else if isDataText?
-            $theErrorField.val("").attr "placeholder", "Only letter for this field"
+            $theErrorField.val("").attr "placeholder", errorsArray[1].val
           else if isDataNumber?
-            $theErrorField.val("").attr "placeholder", "Only numbers are admitted"
+            $theErrorField.val("").attr "placeholder", errorsArray[2].val
           else if isDataLength?
-            $theErrorField.val("").attr "placeholder", "This field must be #{isDataLength} words long"
+            $theErrorField.val("").attr "placeholder", errorsArray[3].val.first + isDataLength + errorsArray[3].val.second
           else
-            $theErrorField.val("").attr "placeholder", "This field is required"
+            $theErrorField.val("").attr "placeholder", errorsArray[4].val
 
           # Perform a switch between value and placeholder
           # or vice versa
