@@ -1,2 +1,3 @@
 $ ->
   $(".jq-verify").jqValidator()
+  return
