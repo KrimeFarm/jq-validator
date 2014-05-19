@@ -20,9 +20,10 @@
         }
       };
       return this.each(function() {
-        var $formElements, $submit, $this, checkAllComplete, checkElemFull, checkIsMail, checkIsName, checkIsNumber, emailReg, fieldLenght, fieldMail, fieldName, fieldNumber, nameReg, numberReg, size;
+        var $formCheckbox, $formElements, $submit, $this, checkAllComplete, checkElemFull, checkIsMail, checkIsName, checkIsNumber, emailReg, fieldLenght, fieldMail, fieldNumber, fieldText, nameReg, numberReg, size;
         $this = $(this);
-        $formElements = $("input, textarea, select", $this);
+        $formElements = $("input:not([type=\"checkbox\"]):not([type=\"button\"]):not([type=\"button\"]), textarea, select", $this);
+        $formCheckbox = $("input[type=\"checkbox\"]", $this);
         $submit = $(settings.buttonClass, $this);
         nameReg = /^[A-Za-z]+$/;
         numberReg = /^[0-9]+$/;
@@ -46,7 +47,7 @@
           var dataLength, stringLenght;
           dataLength = $(element).attr("data-length");
           if (dataLength != null) {
-            stringLenght = dataLength - 1;
+            stringLenght = dataLength;
             return stringLenght;
           } else {
             stringLenght = 0;
@@ -73,21 +74,21 @@
             return isnumber = true;
           }
         };
-        fieldName = function(element) {
-          var isName, isname, name;
-          isName = $(element).attr("data-name");
-          if (isName != null) {
+        fieldText = function(element) {
+          var isText, istext, name;
+          isText = $(element).attr("data-text");
+          if (isText != null) {
             name = $(element).val();
-            return isname = checkIsName(name);
+            return istext = checkIsName(name);
           } else {
-            return isname = true;
+            return istext = true;
           }
         };
         checkElemFull = function(element) {
           var ismail, isname, isnumber, issuedLength, value;
           issuedLength = fieldLenght(element);
           ismail = fieldMail(element);
-          isname = fieldName(element);
+          isname = fieldText(element);
           isnumber = fieldNumber(element);
           log("data-length " + (fieldLenght()));
           log("issuedLength " + issuedLength);

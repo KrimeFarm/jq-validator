@@ -21,7 +21,8 @@ $.fn.extend
     return @each ()->
 
       $this = $(this)
-      $formElements = $("input, textarea, select", $this)
+      $formElements = $("input:not([type=\"checkbox\"]):not([type=\"button\"]):not([type=\"button\"]), textarea, select", $this)
+      $formCheckbox = $("input[type=\"checkbox\"]", $this)
       $submit = $(settings.buttonClass, $this)
 
       # Regular expressions
@@ -59,7 +60,7 @@ $.fn.extend
       fieldLenght = (element) ->
         dataLength = $(element).attr "data-length"
         if dataLength?
-          stringLenght = dataLength - 1
+          stringLenght = dataLength
           return stringLenght
         else
           stringLenght = 0
@@ -81,13 +82,13 @@ $.fn.extend
         else
           isnumber = true
 
-      fieldName = (element) ->
-        isName = $(element).attr "data-name"
-        if isName?
+      fieldText = (element) ->
+        isText = $(element).attr "data-text"
+        if isText?
           name = $(element).val()
-          isname = checkIsName(name)
+          istext = checkIsName(name)
         else
-          isname = true
+          istext = true
 
 
 
@@ -105,7 +106,7 @@ $.fn.extend
         # if anything else is not required.
         issuedLength = fieldLenght(element)
         ismail = fieldMail(element)
-        isname = fieldName(element)
+        isname = fieldText(element)
         isnumber = fieldNumber(element)
 
         # Debug scripts
