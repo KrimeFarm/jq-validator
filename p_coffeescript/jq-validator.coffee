@@ -229,7 +229,7 @@ $.fn.extend
           else if isDataNumber?
             $theErrorField.val("").attr "placeholder", errorsArray[2].val
           else if isDataLength?
-            $theErrorField.val("").attr "placeholder", errorsArray[3].val.first + isDataLength + errorsArray[3].val.second
+            $theErrorField.val("").attr "placeholder", errorsArray[3].val.first + " #{isDataLength} " + errorsArray[3].val.second
           else
             $theErrorField.val("").attr "placeholder", errorsArray[4].val
 
