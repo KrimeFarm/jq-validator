@@ -68,9 +68,9 @@ $.fn.extend
           stringLenght = 0
           return stringLenght
 
-      checkRadioVerified = (element) ->
-        checkRadioRequired = $(element).attr "data-requiredbox"
-        if checkRadioRequired?
+      checkboxVerified = (element) ->
+        checkboxRequired = $(element).attr "data-requiredbox"
+        if checkboxRequired?
           dataChecked = $(element).prop "checked"
           log "Checkbox is #{dataChecked}"
           return dataChecked
@@ -119,7 +119,7 @@ $.fn.extend
         ismail = fieldMail(element)
         isname = fieldText(element)
         isnumber = fieldNumber(element)
-        ischecked = checkRadioVerified(element)
+        ischecked = checkboxVerified(element)
 
         # Debug scripts
         log "data-length #{fieldLenght()}"

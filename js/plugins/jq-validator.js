@@ -20,7 +20,7 @@
         }
       };
       return this.each(function() {
-        var $formElements, $submit, $this, checkAllComplete, checkElemFull, checkIsMail, checkIsName, checkIsNumber, checkRadioVerified, emailReg, fieldLenght, fieldMail, fieldNumber, fieldText, nameReg, numberReg, size;
+        var $formElements, $submit, $this, checkAllComplete, checkElemFull, checkIsMail, checkIsName, checkIsNumber, checkboxVerified, emailReg, fieldLenght, fieldMail, fieldNumber, fieldText, nameReg, numberReg, size;
         $this = $(this);
         $formElements = $("input:not([type=\"radio\"]):not([type=\"button\"]), textarea, select", $this);
         $submit = $(settings.buttonClass, $this);
@@ -53,10 +53,10 @@
             return stringLenght;
           }
         };
-        checkRadioVerified = function(element) {
-          var checkRadioRequired, dataChecked;
-          checkRadioRequired = $(element).attr("data-requiredbox");
-          if (checkRadioRequired != null) {
+        checkboxVerified = function(element) {
+          var checkboxRequired, dataChecked;
+          checkboxRequired = $(element).attr("data-requiredbox");
+          if (checkboxRequired != null) {
             dataChecked = $(element).prop("checked");
             log("Checkbox is " + dataChecked);
             return dataChecked;
@@ -100,7 +100,7 @@
           ismail = fieldMail(element);
           isname = fieldText(element);
           isnumber = fieldNumber(element);
-          ischecked = checkRadioVerified(element);
+          ischecked = checkboxVerified(element);
           log("data-length " + (fieldLenght()));
           log("issuedLength " + issuedLength);
           value = $(element).val();
