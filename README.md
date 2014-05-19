@@ -1,26 +1,22 @@
-jq-validator (beta)
-============
+bootstrap-configuration
+=======================
 
-#### This software is still in development!
+Front end development configuration with Bootstrap as a git module, Grunt configuration for main project with Less, CoffeeScript support, templating support.
 
-An easy to use jQuery validation plugin tailored for Bootstrap **beta**.
+## Grunt Tasks
 
-## Configurations
+### `$ grunt prepare`
 
-```coffeescript
-      debug: false # debug option for console.log
-      preventDefault: true # True to prevent submit action when button is pressed and when button is a type="submit"
-      buttonClass: ".btn" # The class of the submit button
-      callback: () -> # callback called when the form is submitted
-      error: () -> # call a function if the form is not compiled correctly
-```
+When a **Bootstrap** update is downloaded, the _prepare_ task copies all the relevant file into the main development folder.
 
-## Custom data attributes
+### `$ grunt build`
 
-`data-lenght="3"` The minimum lenght of the string in the input field
+Build the current development files (html, css, jscript).
 
-`data-mail` The string needs to be an email
+### `$ grunt`
 
-`data-number` The string has to be a number
+Check for relevant changes in the **Less**, **CoffeeScript** and **HTML** files and consequently compile them.
 
-`data-name` The string is letters only
+### `$ grunt dist`
+
+Copy the relevant files into the `dist/` folder, ready to be published.
