@@ -1,2 +1,2 @@
 $ ->
-  console.log "G"
+  $(".jq-verify").jqValidator()

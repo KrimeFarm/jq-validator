@@ -7,7 +7,7 @@
     jqValidator: function(options) {
       var log, settings;
       settings = {
-        debug: false,
+        debug: true,
         preventDefault: true,
         buttonClass: ".btn",
         callback: function() {},
@@ -94,7 +94,7 @@
           value = $(element).val();
           value = value.length;
           log("value is " + value);
-          if (value > issuedLength && ismail === true && isname === true && isnumber === true) {
+          if (value >= issuedLength && ismail === true && isname === true && isnumber === true) {
             $(element).addClass("checked").removeClass("error");
             return $(element).closest(".form-group").removeClass("has-error");
           } else {

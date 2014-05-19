@@ -4,7 +4,7 @@ $.fn.extend
   jqValidator: (options) ->
     # Default settings
     settings =
-      debug: false # debug option for console.log
+      debug: true # debug option for console.log
       preventDefault: true # True to prevent submit action when button is pressed and when button is a type="submit"
       buttonClass: ".btn" # The class of the submit button
       callback: () -> # callback called when the form is submitted
@@ -122,7 +122,7 @@ $.fn.extend
 
         # Now check the whole lot of data- attribute
         # and if the field is compiled as requested
-        if value > issuedLength and ismail is true and isname is true and isnumber is true
+        if value >= issuedLength and ismail is true and isname is true and isnumber is true
           $(element)
             .addClass "checked"
             .removeClass "error"
