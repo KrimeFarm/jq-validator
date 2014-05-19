@@ -172,10 +172,10 @@ $.fn.extend
 
 
       # jQuery $.getJSON to transform
-      # errors.json file into array,
+      # errors.json file into an array
       # which contains all the errors
       # that will be displayed in form
-      # fields.
+      # fields placeholders.
       errorsArray=[]
       $.getJSON settings.errorsLog, (data) ->
         $.each data, (key, val) ->
