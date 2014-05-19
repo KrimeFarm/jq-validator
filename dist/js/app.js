@@ -1,6 +1,6 @@
 (function() {
   $(function() {
-    return console.log("G");
+    return $(".jq-verify").jqValidator();
   });
 
 }).call(this);
