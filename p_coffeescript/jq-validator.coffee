@@ -4,7 +4,7 @@ $.fn.extend
   jqValidator: (options) ->
     # Default settings
     settings =
-      debug: true # debug option for console.log
+      debug: false # debug option for console.log
       preventDefault: true # True to prevent submit action when button is pressed and when button is a type="submit"
       buttonClass: ".btn" # The class of the submit button
       placeholderTimeout: 2000 # The timeout placeholder animation
@@ -171,6 +171,11 @@ $.fn.extend
           $(settings.buttonClass).removeClass "submit-ready"
 
 
+      # jQuery $.getJSON to transform
+      # errors.json file into array,
+      # which contains all the errors
+      # that will be displayed in form
+      # fields.
       errorsArray=[]
       $.getJSON settings.errorsLog, (data) ->
         $.each data, (key, val) ->
@@ -215,14 +220,16 @@ $.fn.extend
           theErrorFieldValue = $theErrorField.val()
           theErrorFieldPlaceholder = $theErrorField.attr "placeholder"
 
-          # Write the right val() into the required field
-          # eg: if email or not
+          # Check to what data- object the
+          # error is related
           isDataMail = $theErrorField.attr "data-mail"
           isDataText = $theErrorField.attr "data-text"
           isDataNumber = $theErrorField.attr "data-number"
           isDataLength = $theErrorField.attr "data-length"
 
 
+          # Print the right error depending on
+          # what the error is (very roughly implemented)
           if isDataMail?
             $theErrorField.val("").attr "placeholder", errorsArray[0].val
           else if isDataText?

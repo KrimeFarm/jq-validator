@@ -7,7 +7,7 @@
     jqValidator: function(options) {
       var log, settings;
       settings = {
-        debug: true,
+        debug: false,
         preventDefault: true,
         buttonClass: ".btn",
         placeholderTimeout: 2000,
