@@ -58,7 +58,8 @@
           var checkboxRequired, dataChecked;
           checkboxRequired = $(element).attr("data-requiredbox");
           if (checkboxRequired != null) {
-            return dataChecked = $(element).prop("checked");
+            dataChecked = $(element).prop("checked");
+            return log("Checkbox is " + dataChecked);
           }
         };
         fieldMail = function(element) {
@@ -107,8 +108,10 @@
           isname = fieldText(element);
           isnumber = fieldNumber(element);
           ischecked = checkboxVerified(element);
+          log("issuedLength " + issuedLength);
           value = $(element).val();
           value = value.length;
+          log("value is " + value);
           if ((issuedLength != null) && issuedLength <= value) {
             controlClass(element, "length", true);
           } else {
@@ -128,9 +131,11 @@
           }
         };
         size = $formElements.size();
+        log("to check " + size);
         checkAllComplete = function(elements) {
           var elementsSize;
           elementsSize = $(elements).size();
+          log("Elements Size is " + elementsSize + " to check " + size);
           if (elementsSize === size) {
             return $(settings.buttonClass).addClass("submit-ready");
           } else {
@@ -156,8 +161,10 @@
             return checkAllComplete(".checked");
           });
           if ($(this).hasClass("submit-ready")) {
+            log("submit");
             return settings.callback.call(this);
           } else {
+            log("don't submit");
             $theErrorField = $("[class$=-field-error]").first();
             $theErrorField.focus();
             theErrorFieldValue = $theErrorField.val() !== "" ? $theErrorField.val() : null;

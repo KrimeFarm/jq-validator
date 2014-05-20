@@ -74,7 +74,7 @@ $.fn.extend
         if checkboxRequired?
           dataChecked = $(element).prop "checked"
           # Debug
-          # log "Checkbox is #{dataChecked}"
+          log "Checkbox is #{dataChecked}"
 
       fieldMail = (element) ->
         isMail = $(element).attr "data-mail"
@@ -132,7 +132,7 @@ $.fn.extend
         ischecked = checkboxVerified(element)
 
         # Debug
-        # log "issuedLength #{issuedLength}"
+        log "issuedLength #{issuedLength}"
 
         # This verify the length of
         # the input field value
@@ -140,7 +140,7 @@ $.fn.extend
         value = value.length
 
         # Debug
-        # log "value is #{value}"
+        log "value is #{value}"
 
         # Now check the whole lot of data- attribute
         # and if the field is compiled as requested
@@ -178,7 +178,7 @@ $.fn.extend
       size = $formElements.size()
 
       # Debug
-      # log "to check #{size}"
+      log "to check #{size}"
 
       # The checkAllComplete verifies that
       # all controllable input fields are
@@ -188,7 +188,7 @@ $.fn.extend
         # The number of the ".checked" fields
         elementsSize = $(elements).size()
         # Debug
-        # log "Elements Size is #{elementsSize} to check #{size}"
+        log "Elements Size is #{elementsSize} to check #{size}"
         if elementsSize is size
           $(settings.buttonClass).addClass "submit-ready"
         else
@@ -227,7 +227,7 @@ $.fn.extend
 
         if $(this).hasClass "submit-ready"
           # Debug
-          # log "submit"
+          log "submit"
 
           # This is the callback function
           # which can be used to fire another
@@ -242,7 +242,7 @@ $.fn.extend
           # is NOT correctly compiled
 
           # Debug
-          # log "don't submit"
+          log "don't submit"
 
           $theErrorField = $("[class$=-field-error]").first()
           $theErrorField.focus()
