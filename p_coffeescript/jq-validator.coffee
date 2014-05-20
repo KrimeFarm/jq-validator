@@ -4,7 +4,7 @@ $.fn.extend
   jqValidator: (options) ->
     # Default settings
     settings =
-      debug: false # debug option for console.log
+      debug: true # debug option for console.log
       preventDefault: true # True to prevent submit action when button is pressed and when button is a type="submit"
       buttonClass: ".btn" # The class of the submit button
       placeholderTimeout: 2000 # The timeout placeholder animation
@@ -67,17 +67,14 @@ $.fn.extend
           stringLenght = dataLength
           return stringLenght
         else
-          stringLenght = 0
-          return stringLenght
+          ismail = null
 
       checkboxVerified = (element) ->
         checkboxRequired = $(element).attr "data-requiredbox"
         if checkboxRequired?
           dataChecked = $(element).prop "checked"
-          log "Checkbox is #{dataChecked}"
+          #log "Checkbox is #{dataChecked}"
           return dataChecked
-        else
-          return true
 
       fieldMail = (element) ->
         isMail = $(element).attr "data-mail"
@@ -85,7 +82,7 @@ $.fn.extend
           mail = $(element).val()
           ismail = checkIsMail(mail)
         else
-          ismail = true
+          return null
 
       fieldNumber = (element) ->
         isNumber = $(element).attr "data-number"
@@ -93,7 +90,7 @@ $.fn.extend
           number = $(element).val()
           isnumber = checkIsNumber(number)
         else
-          isnumber = true
+          isnumber = null
 
       fieldText = (element) ->
         isText = $(element).attr "data-text"
@@ -101,9 +98,20 @@ $.fn.extend
           name = $(element).val()
           istext = checkIsName(name)
         else
-          istext = true
+          istext = null
 
 
+      controlClass = (element, checkme) ->
+        if checkme is true
+          $(element)
+            .addClass "checked"
+            .removeClass "error"
+          $(element).closest(".form-group").removeClass "has-error"
+        else
+          $(element).closest(".form-group").addClass "has-error"
+          $(element)
+            .removeClass "checked"
+            .addClass "error"
 
       # The main function that
       # is fired when the form
@@ -124,8 +132,7 @@ $.fn.extend
         ischecked = checkboxVerified(element)
 
         # Debug scripts
-        log "data-length #{fieldLenght()}"
-        log "issuedLength #{issuedLength}"
+        # log "issuedLength #{issuedLength}"
 
         # This verify the length of
         # the input field value
@@ -133,20 +140,29 @@ $.fn.extend
         value = value.length
 
         # Debug
-        log "value is #{value}"
+        # log "value is #{value}"
 
         # Now check the whole lot of data- attribute
         # and if the field is compiled as requested
-        if value >= issuedLength and ismail is true and isname is true and isnumber is true and ischecked is true
-          $(element)
-            .addClass "checked"
-            .removeClass "error"
-          $(element).closest(".form-group").removeClass "has-error"
+
+        # Check while data-lenght present
+        # if the actual value is correct
+        if issuedLength? and issuedLength <= value
+          controlClass(element, true)
         else
-          $(element).closest(".form-group").addClass "has-error"
-          $(element)
-            .removeClass "checked"
-            .addClass "error"
+          controlClass(element, false)
+
+        if ismail?
+          controlClass(element, ismail)
+
+        if isname?
+          controlClass(element, isname)
+
+        if isnumber?
+          controlClass(element, isnumber)
+
+        if ischecked?
+          controlClass(element, ischecked)
 
 
 
@@ -155,7 +171,7 @@ $.fn.extend
       size = $formElements.size()
 
       # Debug
-      log "to check #{size}"
+      #log "to check #{size}"
 
       # The checkAllComplete verifies that
       # all controllable input fields are
@@ -164,7 +180,7 @@ $.fn.extend
       checkAllComplete = (elements) ->
         # The number of the ".checked" fields
         elementsSize = $(elements).size()
-        log "Elements Size is #{elementsSize} to check #{size}"
+        #log "Elements Size is #{elementsSize} to check #{size}"
         if elementsSize is size
           $(settings.buttonClass).addClass "submit-ready"
         else
@@ -207,17 +223,18 @@ $.fn.extend
           # function like an Ajax submission
           settings.callback.call(this)
           # Debug
-          log "submit"
+          #log "submit"
         else
           # Debug
-          log "don't submit"
+          #log "don't submit"
 
           # Few checks to be run when the
           # button is clicked to do some
           # magic animation
           $theErrorField = $(".error").first()
           $theErrorField.focus()
-          theErrorFieldValue = $theErrorField.val()
+          theErrorFieldValue = if $theErrorField.val() isnt "" then $theErrorField.val() else null
+          log theErrorFieldValue
           theErrorFieldPlaceholder = $theErrorField.attr "placeholder"
 
           # Check to what data- object the
@@ -226,19 +243,24 @@ $.fn.extend
           isDataText = $theErrorField.attr "data-text"
           isDataNumber = $theErrorField.attr "data-number"
           isDataLength = $theErrorField.attr "data-length"
+          isDataCheckbox = $theErrorField.attr "data-requiredbox"
 
 
           # Print the right error depending on
           # what the error is (very roughly implemented)
+          if isDataLength?
+            $theErrorField.val("").attr "placeholder", errorsArray[3].val.first + " #{isDataLength} " + errorsArray[3].val.second
+
           if isDataMail?
             $theErrorField.val("").attr "placeholder", errorsArray[0].val
-          else if isDataText?
+
+          if isDataText?
             $theErrorField.val("").attr "placeholder", errorsArray[1].val
-          else if isDataNumber?
+
+          if isDataNumber?
             $theErrorField.val("").attr "placeholder", errorsArray[2].val
-          else if isDataLength?
-            $theErrorField.val("").attr "placeholder", errorsArray[3].val.first + " #{isDataLength} " + errorsArray[3].val.second
-          else
+
+          if isDataCheckbox?
             $theErrorField.val("").attr "placeholder", errorsArray[4].val
 
           # Perform a switch between value and placeholder
