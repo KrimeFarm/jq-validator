@@ -4,7 +4,7 @@ $.fn.extend
   jqValidator: (options) ->
     # Default settings
     settings =
-      debug: true # debug option for console.log
+      debug: false # debug option for console.log
       preventDefault: true # True to prevent submit action when button is pressed and when button is a type="submit"
       buttonClass: ".btn" # The class of the submit button
       placeholderTimeout: 2000 # The timeout placeholder animation
