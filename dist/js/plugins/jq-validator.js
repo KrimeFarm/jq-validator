@@ -11,7 +11,7 @@
         preventDefault: true,
         buttonClass: ".btn",
         placeholderTimeout: 2000,
-        errorsLog: "configuration/errors-en.json",
+        errorsFile: "configuration/errors-en.json",
         callback: function() {},
         error: function() {}
       };
@@ -22,7 +22,7 @@
         }
       };
       return this.each(function() {
-        var $formElements, $submit, $this, checkAllComplete, checkElemFull, checkIsMail, checkIsName, checkIsNumber, checkboxVerified, emailReg, errorsArray, fieldLenght, fieldMail, fieldNumber, fieldText, nameReg, numberReg, size;
+        var $formElements, $submit, $this, checkAllComplete, checkElemFull, checkIsMail, checkIsName, checkIsNumber, checkboxVerified, controlClass, emailReg, errorsArray, fieldLenght, fieldMail, fieldNumber, fieldText, nameReg, numberReg, size;
         $this = $(this);
         $formElements = $("input:not([type=\"radio\"]):not([type=\"button\"]), textarea, select", $this);
         $submit = $(settings.buttonClass, $this);
@@ -51,8 +51,7 @@
             stringLenght = dataLength;
             return stringLenght;
           } else {
-            stringLenght = 0;
-            return stringLenght;
+            return null;
           }
         };
         checkboxVerified = function(element) {
@@ -60,10 +59,7 @@
           checkboxRequired = $(element).attr("data-requiredbox");
           if (checkboxRequired != null) {
             dataChecked = $(element).prop("checked");
-            log("Checkbox is " + dataChecked);
-            return dataChecked;
-          } else {
-            return true;
+            return log("Checkbox is " + dataChecked);
           }
         };
         fieldMail = function(element) {
@@ -73,7 +69,7 @@
             mail = $(element).val();
             return ismail = checkIsMail(mail);
           } else {
-            return ismail = true;
+            return null;
           }
         };
         fieldNumber = function(element) {
@@ -83,7 +79,7 @@
             number = $(element).val();
             return isnumber = checkIsNumber(number);
           } else {
-            return isnumber = true;
+            return null;
           }
         };
         fieldText = function(element) {
@@ -93,7 +89,16 @@
             name = $(element).val();
             return istext = checkIsName(name);
           } else {
-            return istext = true;
+            return null;
+          }
+        };
+        controlClass = function(element, type, checkme) {
+          if (checkme === true) {
+            $(element).addClass("checked").removeClass("" + type + "-field-error");
+            return $(element).closest(".form-group").removeClass("has-error");
+          } else {
+            $(element).closest(".form-group").addClass("has-error");
+            return $(element).removeClass("checked").addClass("" + type + "-field-error");
           }
         };
         checkElemFull = function(element) {
@@ -103,17 +108,26 @@
           isname = fieldText(element);
           isnumber = fieldNumber(element);
           ischecked = checkboxVerified(element);
-          log("data-length " + (fieldLenght()));
           log("issuedLength " + issuedLength);
           value = $(element).val();
           value = value.length;
           log("value is " + value);
-          if (value >= issuedLength && ismail === true && isname === true && isnumber === true && ischecked === true) {
-            $(element).addClass("checked").removeClass("error");
-            return $(element).closest(".form-group").removeClass("has-error");
+          if ((issuedLength != null) && issuedLength <= value) {
+            controlClass(element, "length", true);
           } else {
-            $(element).closest(".form-group").addClass("has-error");
-            return $(element).removeClass("checked").addClass("error");
+            controlClass(element, "length", false);
+          }
+          if (ismail != null) {
+            controlClass(element, "mail", ismail);
+          }
+          if (isname != null) {
+            controlClass(element, "name", isname);
+          }
+          if (isnumber != null) {
+            controlClass(element, "number", isnumber);
+          }
+          if (ischecked != null) {
+            return controlClass(element, "checkbox", ischecked);
           }
         };
         size = $formElements.size();
@@ -129,7 +143,7 @@
           }
         };
         errorsArray = [];
-        $.getJSON(settings.errorsLog, function(data) {
+        $.getJSON(settings.errorsFile, function(data) {
           return $.each(data, function(key, val) {
             errorsArray.push({
               key: key,
@@ -138,7 +152,7 @@
           });
         });
         return $(settings.buttonClass).click(function(e) {
-          var $theErrorField, isDataLength, isDataMail, isDataNumber, isDataText, theErrorFieldPlaceholder, theErrorFieldValue;
+          var $theErrorField, isDataCheckbox, isDataLength, isDataMail, isDataNumber, isDataText, theDataLenght, theErrorFieldPlaceholder, theErrorFieldValue;
           if (settings.preventDefault) {
             e.preventDefault();
           }
@@ -147,34 +161,43 @@
             return checkAllComplete(".checked");
           });
           if ($(this).hasClass("submit-ready")) {
-            settings.callback.call(this);
-            return log("submit");
+            log("submit");
+            return settings.callback.call(this);
           } else {
             log("don't submit");
-            $theErrorField = $(".error").first();
+            $theErrorField = $("[class$=-field-error]").first();
             $theErrorField.focus();
-            theErrorFieldValue = $theErrorField.val();
+            theErrorFieldValue = $theErrorField.val() !== "" ? $theErrorField.val() : null;
             theErrorFieldPlaceholder = $theErrorField.attr("placeholder");
-            isDataMail = $theErrorField.attr("data-mail");
-            isDataText = $theErrorField.attr("data-text");
-            isDataNumber = $theErrorField.attr("data-number");
-            isDataLength = $theErrorField.attr("data-length");
-            if (isDataMail != null) {
+            log("is the placeholder: " + theErrorFieldPlaceholder);
+            log("is the value: " + theErrorFieldValue);
+            isDataMail = $theErrorField.hasClass("mail-field-error");
+            isDataText = $theErrorField.hasClass("text-field-error");
+            isDataNumber = $theErrorField.hasClass("number-field-error");
+            isDataLength = $theErrorField.hasClass("length-field-error");
+            isDataCheckbox = $theErrorField.attr("checkbox-field-error");
+            theDataLenght = $theErrorField.attr("data-length");
+            if (isDataLengt) {
+              if (theDataLenght > 1) {
+                $theErrorField.val("").attr("placeholder", errorsArray[3].val.first + (" " + theDataLenght + " ") + errorsArray[3].val.second);
+              } else {
+                $theErrorField.val("").attr("placeholder", errorsArray[4].val);
+              }
+            }
+            if (isDataMail) {
               $theErrorField.val("").attr("placeholder", errorsArray[0].val);
-            } else if (isDataText != null) {
+            }
+            if (isDataText) {
               $theErrorField.val("").attr("placeholder", errorsArray[1].val);
-            } else if (isDataNumber != null) {
+            }
+            if (isDataNumber) {
               $theErrorField.val("").attr("placeholder", errorsArray[2].val);
-            } else if (isDataLength != null) {
-              $theErrorField.val("").attr("placeholder", errorsArray[3].val.first + (" " + isDataLength + " ") + errorsArray[3].val.second);
-            } else {
-              $theErrorField.val("").attr("placeholder", errorsArray[4].val);
             }
             setTimeout(function() {
               if (theErrorFieldValue != null) {
-                return $theErrorField.attr("placeholder", theErrorFieldPlaceholder);
-              } else {
                 return $theErrorField.val(theErrorFieldValue);
+              } else {
+                return $theErrorField.attr("placeholder", theErrorFieldPlaceholder);
               }
             }, settings.placeholderTimeout);
             return settings.error.call(this);
