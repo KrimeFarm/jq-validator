@@ -39,7 +39,7 @@ While supporting multilanguage the relative option provide an easy to implement 
   "general": "This field is required!"
 }
 ```
-This should be pretty explanatory, translate in any language you need to support and add a new file called `errors-*language*.js`, the rest is pure js _(check the browser language and launch different instances of **jqValidator** with different json files ... easy peasy)_.
+This should be pretty self explanatory, translate in any language you need to support and add a new file called `errors-*language*.js`, the rest is pure js _(check the browser language and launch different instances of **jqValidator** with different json files ... easy peasy)_.
 
 ## Custom data attributes
 
