@@ -8,7 +8,7 @@ $.fn.extend
       preventDefault: true # True to prevent submit action when button is pressed and when button is a type="submit"
       buttonClass: ".btn" # The class of the submit button
       placeholderTimeout: 2000 # The timeout placeholder animation
-      errorsLog: "configuration/errors-en.json"
+      errorsFile: "configuration/errors-en.json"
       callback: () -> # callback called when the form is submitted
       error: () -> # call a function if the form is not compiled correctly
 
@@ -67,14 +67,14 @@ $.fn.extend
           stringLenght = dataLength
           return stringLenght
         else
-          ismail = null
+          return null
 
       checkboxVerified = (element) ->
         checkboxRequired = $(element).attr "data-requiredbox"
         if checkboxRequired?
           dataChecked = $(element).prop "checked"
-          #log "Checkbox is #{dataChecked}"
-          return dataChecked
+          # Debug
+          # log "Checkbox is #{dataChecked}"
 
       fieldMail = (element) ->
         isMail = $(element).attr "data-mail"
@@ -90,7 +90,7 @@ $.fn.extend
           number = $(element).val()
           isnumber = checkIsNumber(number)
         else
-          isnumber = null
+          return null
 
       fieldText = (element) ->
         isText = $(element).attr "data-text"
@@ -98,20 +98,20 @@ $.fn.extend
           name = $(element).val()
           istext = checkIsName(name)
         else
-          istext = null
+          return null
 
 
-      controlClass = (element, checkme) ->
+      controlClass = (element, type, checkme) ->
         if checkme is true
           $(element)
             .addClass "checked"
-            .removeClass "error"
+            .removeClass "#{type}-field-error"
           $(element).closest(".form-group").removeClass "has-error"
         else
           $(element).closest(".form-group").addClass "has-error"
           $(element)
             .removeClass "checked"
-            .addClass "error"
+            .addClass "#{type}-field-error"
 
       # The main function that
       # is fired when the form
@@ -131,7 +131,7 @@ $.fn.extend
         isnumber = fieldNumber(element)
         ischecked = checkboxVerified(element)
 
-        # Debug scripts
+        # Debug
         # log "issuedLength #{issuedLength}"
 
         # This verify the length of
@@ -146,32 +146,39 @@ $.fn.extend
         # and if the field is compiled as requested
 
         # Check while data-lenght present
-        # if the actual value is correct
+        # if the actual value is correct.
+        # The order right now is strategic, the last
+        # is the most important and always
+        # has the precendence.
+
         if issuedLength? and issuedLength <= value
-          controlClass(element, true)
+          controlClass(element, "length", true)
         else
-          controlClass(element, false)
+          controlClass(element, "length", false)
 
         if ismail?
-          controlClass(element, ismail)
+          controlClass(element, "mail", ismail)
 
         if isname?
-          controlClass(element, isname)
+          controlClass(element, "name", isname)
 
         if isnumber?
-          controlClass(element, isnumber)
+          controlClass(element, "number", isnumber)
 
+        # The checkbox wich is only controlled for
+        # visual error management, aka red colored
+        # label.
         if ischecked?
-          controlClass(element, ischecked)
+          controlClass(element, "checkbox", ischecked)
 
 
 
-      # The number to controlled
+      # The number of controlled
       # form elements.
       size = $formElements.size()
 
       # Debug
-      #log "to check #{size}"
+      # log "to check #{size}"
 
       # The checkAllComplete verifies that
       # all controllable input fields are
@@ -180,7 +187,8 @@ $.fn.extend
       checkAllComplete = (elements) ->
         # The number of the ".checked" fields
         elementsSize = $(elements).size()
-        #log "Elements Size is #{elementsSize} to check #{size}"
+        # Debug
+        # log "Elements Size is #{elementsSize} to check #{size}"
         if elementsSize is size
           $(settings.buttonClass).addClass "submit-ready"
         else
@@ -193,7 +201,7 @@ $.fn.extend
       # that will be displayed in form
       # fields placeholders.
       errorsArray=[]
-      $.getJSON settings.errorsLog, (data) ->
+      $.getJSON settings.errorsFile, (data) ->
         $.each data, (key, val) ->
           errorsArray.push
             key: key
@@ -218,60 +226,73 @@ $.fn.extend
           checkAllComplete(".checked")
 
         if $(this).hasClass "submit-ready"
+          # Debug
+          # log "submit"
+
           # This is the callback function
           # which can be used to fire another
           # function like an Ajax submission
-          settings.callback.call(this)
-          # Debug
-          #log "submit"
-        else
-          # Debug
-          #log "don't submit"
+          # when the form is fully compiled
 
+          settings.callback.call(this)
+        else
           # Few checks to be run when the
           # button is clicked to do some
-          # magic animation
-          $theErrorField = $(".error").first()
+          # magic animations when the form
+          # is NOT correctly compiled
+
+          # Debug
+          # log "don't submit"
+
+          $theErrorField = $("[class$=-field-error]").first()
           $theErrorField.focus()
           theErrorFieldValue = if $theErrorField.val() isnt "" then $theErrorField.val() else null
-          log theErrorFieldValue
           theErrorFieldPlaceholder = $theErrorField.attr "placeholder"
 
-          # Check to what data- object the
-          # error is related
-          isDataMail = $theErrorField.attr "data-mail"
-          isDataText = $theErrorField.attr "data-text"
-          isDataNumber = $theErrorField.attr "data-number"
-          isDataLength = $theErrorField.attr "data-length"
-          isDataCheckbox = $theErrorField.attr "data-requiredbox"
+          log "is the placeholder: #{theErrorFieldPlaceholder}"
+          log "is the value: #{theErrorFieldValue}"
 
+          # Check the error
+          isDataMail = $theErrorField.hasClass "mail-field-error"
+          isDataText = $theErrorField.hasClass "text-field-error"
+          isDataNumber = $theErrorField.hasClass "number-field-error"
+          isDataLength = $theErrorField.hasClass "length-field-error"
+          isDataCheckbox = $theErrorField.attr "checkbox-field-error"
+
+          # Get the "data-lenght" to use into the errorå
+          theDataLenght = $theErrorField.attr "data-length"
 
           # Print the right error depending on
-          # what the error is (very roughly implemented)
-          if isDataLength?
-            $theErrorField.val("").attr "placeholder", errorsArray[3].val.first + " #{isDataLength} " + errorsArray[3].val.second
+          # what the error is displayed by its class
 
-          if isDataMail?
+          # Data -length error
+          if isDataLengt
+            if theDataLenght > 1
+              $theErrorField.val("").attr "placeholder", errorsArray[3].val.first + " #{theDataLenght} " + errorsArray[3].val.second
+            else
+              $theErrorField.val("").attr "placeholder", errorsArray[4].val
+
+          # Data -mail error
+          if isDataMail
             $theErrorField.val("").attr "placeholder", errorsArray[0].val
 
-          if isDataText?
+          # Data -text error
+          if isDataText
             $theErrorField.val("").attr "placeholder", errorsArray[1].val
 
-          if isDataNumber?
+          # Data -number error
+          if isDataNumber
             $theErrorField.val("").attr "placeholder", errorsArray[2].val
 
-          if isDataCheckbox?
-            $theErrorField.val("").attr "placeholder", errorsArray[4].val
-
           # Perform a switch between value and placeholder
-          # or vice versa
+          # or vice versa, depends on the value inside the
+          # input field
           setTimeout ->
             if theErrorFieldValue?
-              $theErrorField.attr "placeholder", theErrorFieldPlaceholder
-            else
               $theErrorField.val(theErrorFieldValue)
+            else
+              $theErrorField.attr "placeholder", theErrorFieldPlaceholder
           , settings.placeholderTimeout
-
 
           # Call a function to be submitted
           # when the form is not correctly
