@@ -14,10 +14,10 @@ Quite simply you call the plugin with the options written below in this document
 ```coffeescript
 $ ->
   $(".myform").jqValidator
-    preventDefault: true # True to prevent submit action when button is pressed and is a type="submit"
+    preventDefault: true # True to prevent submit action when button is pressed and when button is a type="submit"
     buttonClass: ".btn" # The class of the submit button
     placeholderTimeout: 2000 # The timeout placeholder animation
-    errorsLog: "configuration/errors-en.json" # The .json configuration file
+    errorsFile: "configuration/errors-en.json"
     callback: () -> # callback called when the form is submitted
     error: () -> # call a function if the form is not compiled correctly
     return
