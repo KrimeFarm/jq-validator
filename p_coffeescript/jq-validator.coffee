@@ -23,9 +23,7 @@ $.fn.extend
     return @each ()->
 
       $this = $(this)
-      $formElements = $("input:not([type=\"radio\"]):not([type=\"button\"]), textarea, select", $this)
-      # $formCheckbox = $("input[type=\"checkbox\"]", $this)
-      # $formRadio = $("input[type=\"radio\"]", $this)
+      $formElements = $("input:not([type=\"radio\"]):not([type=\"hidden\"]):not([type=\"button\"]):not([disabled=\"disabled\"]), textarea, select", $this)
       $submit = $(settings.buttonClass, $this)
 
       # Regular expressions
@@ -259,14 +257,14 @@ $.fn.extend
           isDataLength = $theErrorField.hasClass "length-field-error"
           isDataCheckbox = $theErrorField.attr "checkbox-field-error"
 
-          # Get the "data-lenght" to use into the errorå
+          # Get the "data-lenght" to use into the error
           theDataLenght = $theErrorField.attr "data-length"
 
           # Print the right error depending on
           # what the error is displayed by its class
 
           # Data -length error
-          if isDataLengt
+          if isDataLength
             if theDataLenght > 1
               $theErrorField.val("").attr "placeholder", errorsArray[3].val.first + " #{theDataLenght} " + errorsArray[3].val.second
             else
