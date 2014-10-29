@@ -48,6 +48,7 @@ $.fn.extend
         pattern = new RegExp(nameReg)
         return pattern.test(input)
 
+      # Fiscal Code for Italian users
       codiceFISCALE = (cfins) ->
         cf = cfins.toUpperCase()
         cfReg = /^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$/

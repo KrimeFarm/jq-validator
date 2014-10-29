@@ -6,5 +6,6 @@
     "first": "This field needs to be",
     "second": "letters long!"
   },
-  "general": "This field is required!"
+  "general": "This field is required!",
+  "fiscalcode": "Fiscal code is not valid"
 }

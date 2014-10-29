@@ -22,9 +22,9 @@
         }
       };
       return this.each(function() {
-        var $formElements, $submit, $this, checkAllComplete, checkElemFull, checkIsMail, checkIsName, checkIsNumber, checkboxVerified, controlClass, emailReg, errorsArray, fieldLenght, fieldMail, fieldNumber, fieldText, nameReg, numberReg, size;
+        var $formElements, $submit, $this, checkAllComplete, checkElemFull, checkIsMail, checkIsName, checkIsNumber, checkboxVerified, codiceFISCALE, controlClass, emailReg, errorsArray, fieldCodFisc, fieldLenght, fieldMail, fieldNumber, fieldText, nameReg, numberReg, size;
         $this = $(this);
-        $formElements = $("input:not([type=\"radio\"]):not([type=\"button\"]), textarea, select", $this);
+        $formElements = $("input:not([type=\"radio\"]):not([type=\"hidden\"]):not([type=\"button\"]):not([disabled=\"disabled\"]), textarea", $this);
         $submit = $(settings.buttonClass, $this);
         nameReg = /^[A-Za-z]+$/;
         numberReg = /^[0-9]+$/;
@@ -43,6 +43,33 @@
           var pattern;
           pattern = new RegExp(nameReg);
           return pattern.test(input);
+        };
+        codiceFISCALE = function(cfins) {
+          var cf, cfReg, i, s, set1, set2, setdisp, setpari;
+          cf = cfins.toUpperCase();
+          cfReg = /^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$/;
+          if (!cfReg.test(cf)) {
+            return false;
+          }
+          set1 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+          set2 = "ABCDEFGHIJABCDEFGHIJKLMNOPQRSTUVWXYZ";
+          setpari = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+          setdisp = "BAKPLCQDREVOSFTGUHMINJWZYX";
+          s = 0;
+          i = 1;
+          while (i <= 13) {
+            s += setpari.indexOf(set2.charAt(set1.indexOf(cf.charAt(i))));
+            i += 2;
+          }
+          i = 0;
+          while (i <= 14) {
+            s += setdisp.indexOf(set2.charAt(set1.indexOf(cf.charAt(i))));
+            i += 2;
+          }
+          if (s % 26 !== cf.charCodeAt(15) - "A".charCodeAt(0)) {
+            return false;
+          }
+          return true;
         };
         fieldLenght = function(element) {
           var dataLength, stringLenght;
@@ -92,6 +119,16 @@
             return null;
           }
         };
+        fieldCodFisc = function(element) {
+          var codFisc, isText, istext;
+          isText = $(element).attr("data-fisc");
+          if (isText != null) {
+            codFisc = $(element).val();
+            return istext = codiceFISCALE(codFisc);
+          } else {
+            return null;
+          }
+        };
         controlClass = function(element, type, checkme) {
           if (checkme === true) {
             $(element).addClass("checked").removeClass("" + type + "-field-error");
@@ -102,12 +139,13 @@
           }
         };
         checkElemFull = function(element) {
-          var ischecked, ismail, isname, isnumber, issuedLength, value;
+          var ischecked, iscodfisc, ismail, isname, isnumber, issuedLength, value;
           issuedLength = fieldLenght(element);
           ismail = fieldMail(element);
           isname = fieldText(element);
           isnumber = fieldNumber(element);
           ischecked = checkboxVerified(element);
+          iscodfisc = fieldCodFisc(element);
           log("issuedLength " + issuedLength);
           value = $(element).val();
           value = value.length;
@@ -125,6 +163,9 @@
           }
           if (isnumber != null) {
             controlClass(element, "number", isnumber);
+          }
+          if (iscodfisc != null) {
+            controlClass(element, "fisc", iscodfisc);
           }
           if (ischecked != null) {
             return controlClass(element, "checkbox", ischecked);
@@ -152,7 +193,7 @@
           });
         });
         return $(settings.buttonClass).click(function(e) {
-          var $theErrorField, isDataCheckbox, isDataLength, isDataMail, isDataNumber, isDataText, theDataLenght, theErrorFieldPlaceholder, theErrorFieldValue;
+          var $theErrorField, isDataCheckbox, isDataFiscal, isDataLength, isDataMail, isDataNumber, isDataText, theDataLenght, theErrorFieldPlaceholder, theErrorFieldValue;
           if (settings.preventDefault) {
             e.preventDefault();
           }
@@ -161,11 +202,16 @@
             return checkAllComplete(".checked");
           });
           if ($(this).hasClass("submit-ready")) {
+            if (settings.preventDefault) {
+              $(settings.buttonClass).unbind("click");
+              $(this).trigger("click");
+            }
             log("submit");
             return settings.callback.call(this);
           } else {
             log("don't submit");
             $theErrorField = $("[class$=-field-error]").first();
+            log($theErrorField);
             $theErrorField.focus();
             theErrorFieldValue = $theErrorField.val() !== "" ? $theErrorField.val() : null;
             theErrorFieldPlaceholder = $theErrorField.attr("placeholder");
@@ -176,8 +222,9 @@
             isDataNumber = $theErrorField.hasClass("number-field-error");
             isDataLength = $theErrorField.hasClass("length-field-error");
             isDataCheckbox = $theErrorField.attr("checkbox-field-error");
+            isDataFiscal = $theErrorField.attr("checkbox-fisc-error");
             theDataLenght = $theErrorField.attr("data-length");
-            if (isDataLengt) {
+            if (isDataLength) {
               if (theDataLenght > 1) {
                 $theErrorField.val("").attr("placeholder", errorsArray[3].val.first + (" " + theDataLenght + " ") + errorsArray[3].val.second);
               } else {
@@ -192,6 +239,9 @@
             }
             if (isDataNumber) {
               $theErrorField.val("").attr("placeholder", errorsArray[2].val);
+            }
+            if (isDataFiscal) {
+              $theErrorField.val("").attr("placeholder", errorsArray[5].val);
             }
             setTimeout(function() {
               if (theErrorFieldValue != null) {
