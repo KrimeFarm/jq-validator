@@ -23,7 +23,7 @@ $.fn.extend
     return @each ()->
 
       $this = $(this)
-      $formElements = $("input:not([type=\"radio\"]):not([type=\"hidden\"]):not([type=\"button\"]):not([disabled=\"disabled\"]), textarea, select", $this)
+      $formElements = $("input:not([type=\"radio\"]):not([type=\"hidden\"]):not([type=\"button\"]):not([disabled=\"disabled\"]), textarea", $this)
       $submit = $(settings.buttonClass, $this)
 
       # Regular expressions
@@ -32,8 +32,6 @@ $.fn.extend
       nameReg = /^[A-Za-z]+$/
       numberReg =  /^[0-9]+$/
       emailReg = /[^\s@]+@[^\s@]+\.[^\s@]+/
-
-
 
       # Put the regular expressions
       # in a function that is used
@@ -50,6 +48,25 @@ $.fn.extend
         pattern = new RegExp(nameReg)
         return pattern.test(input)
 
+      codiceFISCALE = (cfins) ->
+        cf = cfins.toUpperCase()
+        cfReg = /^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$/
+        return false  unless cfReg.test(cf)
+        set1 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        set2 = "ABCDEFGHIJABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        setpari = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        setdisp = "BAKPLCQDREVOSFTGUHMINJWZYX"
+        s = 0
+        i = 1
+        while i <= 13
+          s += setpari.indexOf(set2.charAt(set1.indexOf(cf.charAt(i))))
+          i += 2
+        i = 0
+        while i <= 14
+          s += setdisp.indexOf(set2.charAt(set1.indexOf(cf.charAt(i))))
+          i += 2
+        return false  unless s % 26 is cf.charCodeAt(15) - "A".charCodeAt(0)
+        true
 
 
       # Create a series of functions
@@ -98,6 +115,14 @@ $.fn.extend
         else
           return null
 
+      fieldCodFisc = (element) ->
+        isText = $(element).attr "data-fisc"
+        if isText?
+          codFisc = $(element).val()
+          istext = codiceFISCALE(codFisc)
+        else
+          return null
+
 
       controlClass = (element, type, checkme) ->
         if checkme is true
@@ -128,6 +153,7 @@ $.fn.extend
         isname = fieldText(element)
         isnumber = fieldNumber(element)
         ischecked = checkboxVerified(element)
+        iscodfisc = fieldCodFisc(element)
 
         # Debug
         log "issuedLength #{issuedLength}"
@@ -162,6 +188,9 @@ $.fn.extend
 
         if isnumber?
           controlClass(element, "number", isnumber)
+
+        if iscodfisc?
+          controlClass(element, "fisc", iscodfisc)
 
         # The checkbox wich is only controlled for
         # visual error management, aka red colored
@@ -223,7 +252,13 @@ $.fn.extend
           checkElemFull($(this))
           checkAllComplete(".checked")
 
+        # Auto submit when there is
+        # prevent default
         if $(this).hasClass "submit-ready"
+          if settings.preventDefault
+            $(settings.buttonClass).unbind "click"
+            $(this).trigger "click"
+
           # Debug
           log "submit"
 
@@ -243,6 +278,8 @@ $.fn.extend
           log "don't submit"
 
           $theErrorField = $("[class$=-field-error]").first()
+          log $theErrorField
+
           $theErrorField.focus()
           theErrorFieldValue = if $theErrorField.val() isnt "" then $theErrorField.val() else null
           theErrorFieldPlaceholder = $theErrorField.attr "placeholder"
@@ -256,6 +293,7 @@ $.fn.extend
           isDataNumber = $theErrorField.hasClass "number-field-error"
           isDataLength = $theErrorField.hasClass "length-field-error"
           isDataCheckbox = $theErrorField.attr "checkbox-field-error"
+          isDataFiscal = $theErrorField.attr "checkbox-fisc-error"
 
           # Get the "data-lenght" to use into the error
           theDataLenght = $theErrorField.attr "data-length"
@@ -281,6 +319,11 @@ $.fn.extend
           # Data -number error
           if isDataNumber
             $theErrorField.val("").attr "placeholder", errorsArray[2].val
+
+          # Data -fisc error
+          if isDataFiscal
+            $theErrorField.val("").attr "placeholder", errorsArray[5].val
+
 
           # Perform a switch between value and placeholder
           # or vice versa, depends on the value inside the
